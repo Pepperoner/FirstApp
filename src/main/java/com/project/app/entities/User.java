@@ -22,7 +22,7 @@ public class User implements UserDetails{
     @NotBlank(message = "Password is required")
     private String password;
 
-    @NotBlank(message = "Username is required")
+    //@NotBlank(message = "Username is required")
     private String fullName;
 
     private Boolean isPosted;

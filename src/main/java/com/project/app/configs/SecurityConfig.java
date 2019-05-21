@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static com.project.app.configs.SecurityConstants.SIGN_UP_URLS;
 
@@ -26,22 +25,15 @@ import static com.project.app.configs.SecurityConstants.SIGN_UP_URLS;
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private CustomUserDetailsService customUserDetailsService;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private JWTTokenProvider jwtTokenProvider;
-
-
-    @Bean
-    public JWTAuthenticationFilter jwtAuthenticationFilter() {
-        return new JWTAuthenticationFilter(jwtTokenProvider,customUserDetailsService);}
 
     @Autowired
-    public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, CustomUserDetailsService customUserDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, JWTTokenProvider jwtTokenProvider) {
-        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+    public SecurityConfig(CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomUserDetailsService customUserDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
         this.customUserDetailsService = customUserDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
@@ -58,7 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
+                .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint).and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -76,7 +68,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 ).permitAll()
                 .antMatchers(SIGN_UP_URLS).permitAll()
                 .anyRequest().authenticated();
-
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }

@@ -5,8 +5,6 @@ import com.project.app.services.UserService;
 import com.project.app.services.ValidationErrorService;
 import com.project.app.validators.UserValidator;
 import com.project.app.payload.LoginRequest;
-import com.project.app.configs.JWTTokenProvider;
-import com.project.app.payload.JWTLoginSuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-import static com.project.app.configs.SecurityConstants.TOKEN_PREFIX;
-
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -31,15 +27,13 @@ public class UserController {
     private ValidationErrorService validationErrorService;
     private UserService userService;
     private UserValidator userValidator;
-    private JWTTokenProvider jwtTokenProvider;
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    public UserController(ValidationErrorService validationErrorService, UserService userService, UserValidator userValidator, JWTTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager) {
+    public UserController(ValidationErrorService validationErrorService, UserService userService, UserValidator userValidator, AuthenticationManager authenticationManager) {
         this.validationErrorService = validationErrorService;
         this.userService = userService;
         this.userValidator = userValidator;
-        this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
     }
 
@@ -53,9 +47,8 @@ public class UserController {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = TOKEN_PREFIX + jwtTokenProvider.generateToken(authentication);
 
-        return ResponseEntity.ok(new JWTLoginSuccessResponse(true, jwt));
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping("/register")
