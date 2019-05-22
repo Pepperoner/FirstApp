@@ -13,7 +13,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.project.app.configs.SecurityConstants.H2_URL;
 import static com.project.app.configs.SecurityConstants.SIGN_UP_URLS;
 
 @Configuration
@@ -25,20 +27,21 @@ import static com.project.app.configs.SecurityConstants.SIGN_UP_URLS;
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-    private CustomUserDetailsService customUserDetailsService;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private JwtAuthenticationEntryPoint unauthorizedHandler;
 
     @Autowired
-    public SecurityConfig(CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomUserDetailsService customUserDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
-        this.customUserDetailsService = customUserDetailsService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
+    private CustomUserDetailsService customUserDetailsService;
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {return  new JwtAuthenticationFilter();}
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailsService).passwordEncoder(bCryptPasswordEncoder);
+    protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+        authenticationManagerBuilder.userDetailsService(customUserDetailsService).passwordEncoder(bCryptPasswordEncoder);
     }
 
     @Override
@@ -50,10 +53,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)
-                //.and()
-                //.sessionManagement()
-                //.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .headers().frameOptions().sameOrigin() //To enable H2 Database
                 .and()
                 .authorizeRequests()
                 .antMatchers(
@@ -68,6 +72,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.js"
                 ).permitAll()
                 .antMatchers(SIGN_UP_URLS).permitAll()
+                .antMatchers(H2_URL).permitAll()
                 .anyRequest().authenticated();
+
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }

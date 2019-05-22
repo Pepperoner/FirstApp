@@ -10,14 +10,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
+    @Autowired
     private UserRepository userRepository;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userRepository = userRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public User saveUser(User newUser){
         try{

@@ -5,9 +5,12 @@ import com.project.app.services.UserService;
 import com.project.app.services.ValidationErrorService;
 import com.project.app.validators.UserValidator;
 import com.project.app.payload.LoginRequest;
+import com.project.app.payload.JWTLoginSuccessResponse;
+import com.project.app.configs.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,47 +22,54 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import static com.project.app.configs.SecurityConstants.TOKEN_PREFIX;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
+    @Autowired
     private ValidationErrorService validationErrorService;
+
+    @Autowired
     private UserService userService;
+
+    @Autowired
     private UserValidator userValidator;
 
     @Autowired
-    public UserController(ValidationErrorService validationErrorService, UserService userService, UserValidator userValidator) {
-        this.validationErrorService = validationErrorService;
-        this.userService = userService;
-        this.userValidator = userValidator;
-    }
+    private JwtTokenProvider tokenProvider;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult result){
         ResponseEntity<?> errorMap = validationErrorService.mapValidationService(result);
-        if (errorMap != null) return errorMap;
+        if(errorMap != null) return errorMap;
 
-        //Authentication request = authenticationManager.authenticate(
-        //        new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-        //);
-        //SecurityContextHolder.getContext().setAuthentication(authentication);
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
+        );
 
-        Authentication request = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = TOKEN_PREFIX +  tokenProvider.generateToken(authentication);
 
-        SecurityContextHolder.getContext().setAuthentication(request);
-
-        return ResponseEntity.ok(HttpStatus.OK);
+        return ResponseEntity.ok(new JWTLoginSuccessResponse(true, jwt));
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult result){
-
         userValidator.validate(user,result);
 
         ResponseEntity<?> errorMap = validationErrorService.mapValidationService(result);
-        if (errorMap != null) return errorMap;
+        if(errorMap != null)return errorMap;
 
         User newUser = userService.saveUser(user);
-        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+
+        return  new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 }
