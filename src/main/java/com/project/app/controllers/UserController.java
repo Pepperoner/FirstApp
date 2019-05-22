@@ -8,7 +8,6 @@ import com.project.app.payload.LoginRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,14 +26,12 @@ public class UserController {
     private ValidationErrorService validationErrorService;
     private UserService userService;
     private UserValidator userValidator;
-    private AuthenticationManager authenticationManager;
 
     @Autowired
-    public UserController(ValidationErrorService validationErrorService, UserService userService, UserValidator userValidator, AuthenticationManager authenticationManager) {
+    public UserController(ValidationErrorService validationErrorService, UserService userService, UserValidator userValidator) {
         this.validationErrorService = validationErrorService;
         this.userService = userService;
         this.userValidator = userValidator;
-        this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/login")
@@ -42,11 +39,14 @@ public class UserController {
         ResponseEntity<?> errorMap = validationErrorService.mapValidationService(result);
         if (errorMap != null) return errorMap;
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-        );
+        //Authentication request = authenticationManager.authenticate(
+        //        new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+        //);
+        //SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Authentication request = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
+
+        SecurityContextHolder.getContext().setAuthentication(request);
 
         return ResponseEntity.ok(HttpStatus.OK);
     }

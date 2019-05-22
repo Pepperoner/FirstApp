@@ -1,5 +1,6 @@
 package com.project.app.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -22,7 +23,7 @@ public class User implements UserDetails{
     @NotBlank(message = "Password is required")
     private String password;
 
-    //@NotBlank(message = "Username is required")
+    @NotBlank(message = "Username is required")
     private String fullName;
 
     private Boolean isPosted;
@@ -30,6 +31,7 @@ public class User implements UserDetails{
     private String registrationStatus;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Profile profile;
 
     public User() {
