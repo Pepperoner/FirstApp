@@ -21,11 +21,14 @@ import static com.project.app.configs.SecurityConstants.TOKEN_PREFIX;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
     private JwtTokenProvider tokenProvider;
+    private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, CustomUserDetailsService customUserDetailsService) {
+        this.tokenProvider = tokenProvider;
+        this.customUserDetailsService = customUserDetailsService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,

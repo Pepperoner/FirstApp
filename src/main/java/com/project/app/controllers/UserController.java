@@ -28,20 +28,20 @@ import static com.project.app.configs.SecurityConstants.TOKEN_PREFIX;
 @RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
     private ValidationErrorService validationErrorService;
-
-    @Autowired
     private UserService userService;
-
-    @Autowired
     private UserValidator userValidator;
-
-    @Autowired
     private JwtTokenProvider tokenProvider;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    public UserController(ValidationErrorService validationErrorService, UserService userService, UserValidator userValidator, JwtTokenProvider tokenProvider, AuthenticationManager authenticationManager) {
+        this.validationErrorService = validationErrorService;
+        this.userService = userService;
+        this.userValidator = userValidator;
+        this.tokenProvider = tokenProvider;
+        this.authenticationManager = authenticationManager;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult result){

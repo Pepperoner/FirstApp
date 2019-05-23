@@ -27,17 +27,21 @@ import static com.project.app.configs.SecurityConstants.SIGN_UP_URLS;
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
     private JwtAuthenticationEntryPoint unauthorizedHandler;
+    private CustomUserDetailsService customUserDetailsService;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    public SecurityConfig(JwtAuthenticationEntryPoint unauthorizedHandler, CustomUserDetailsService customUserDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtTokenProvider jwtTokenProvider) {
+        this.unauthorizedHandler = unauthorizedHandler;
+        this.customUserDetailsService = customUserDetailsService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {return  new JwtAuthenticationFilter();}
-
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {return  new JwtAuthenticationFilter(jwtTokenProvider,customUserDetailsService);}
 
     @Override
     protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
