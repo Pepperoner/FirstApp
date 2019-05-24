@@ -2,6 +2,7 @@ package com.project.app.entities;
 
 import javax.persistence.*;
 
+
 @Entity
 @Table(name = "profiles")
 public class Profile {
@@ -23,10 +24,14 @@ public class Profile {
     private String skills;
 
     @OneToOne
-    @MapsId
+    //@MapsId
     private User user;
 
     public Profile() {
+    }
+
+    public Profile(User user) {
+        this.user = user;
     }
 
     public Long getId() {
