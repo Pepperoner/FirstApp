@@ -38,7 +38,9 @@ public class UserController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    public UserController(ValidationErrorService validationErrorService, UserService userService, ProfileService profileService, UserValidator userValidator, JwtTokenProvider tokenProvider, AuthenticationManager authenticationManager) {
+    public UserController(ValidationErrorService validationErrorService, UserService userService,
+                          ProfileService profileService, UserValidator userValidator,
+                          JwtTokenProvider tokenProvider, AuthenticationManager authenticationManager) {
         this.validationErrorService = validationErrorService;
         this.userService = userService;
         this.profileService = profileService;

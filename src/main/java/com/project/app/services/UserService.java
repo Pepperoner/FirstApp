@@ -12,22 +12,20 @@ public class UserService {
 
     private UserRepository userRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private ProfileService profileService;
 
     @Autowired
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, ProfileService profileService) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.profileService = profileService;
     }
 
-    public User saveUser(User newUser){
-        try{
+    public User saveUser(User newUser) {
+        try {
             newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
             newUser.setUsername(newUser.getUsername());
             return userRepository.save(newUser);
-        }catch (Exception e){
-            throw new UserNameExistsException("Username '"+newUser.getUsername()+"' already exists");
+        } catch (Exception e) {
+            throw new UserNameExistsException("Username '" + newUser.getUsername() + "' already exists");
         }
     }
 }

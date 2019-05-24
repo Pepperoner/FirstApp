@@ -7,8 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ProfileRepository extends CrudRepository<Profile,Long> {
-
+public interface ProfileRepository extends CrudRepository<Profile, Long> {
     Optional<Profile> findById(Long profileId);
 
     @Override

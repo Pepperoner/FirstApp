@@ -19,7 +19,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     }
 
     @ExceptionHandler
-    public final ResponseEntity<Object> handleProjectIdentifierException(ProfileIdentifierException ex, WebRequest request){
+    public final ResponseEntity<Object> handleProfileIdentifierException(ProfileIdentifierException ex, WebRequest request){
         ProfileIdentifierExceptionResponse exceptionResponse = new ProfileIdentifierExceptionResponse(ex.getMessage());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }

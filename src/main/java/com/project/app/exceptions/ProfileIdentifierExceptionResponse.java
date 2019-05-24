@@ -1,18 +1,12 @@
 package com.project.app.exceptions;
 
-public class ProfileIdentifierExceptionResponse {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+@AllArgsConstructor
+class ProfileIdentifierExceptionResponse {
     private String profileIdentifier;
-
-    ProfileIdentifierExceptionResponse(String profileIdentifier) {
-        this.profileIdentifier = profileIdentifier;
-    }
-
-    public String getProfileIdentifier() {
-        return profileIdentifier;
-    }
-
-    public void setProfileIdentifier(String profileIdentifier) {
-        this.profileIdentifier = profileIdentifier;
-    }
 }

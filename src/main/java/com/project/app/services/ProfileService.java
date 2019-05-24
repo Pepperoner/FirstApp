@@ -16,22 +16,20 @@ public class ProfileService {
         this.profileRepository = profileRepository;
     }
 
-    public Profile findProfileByIdentifier(Long profileId){
-
-        if (profileId == null){
-            throw new ProfileIdentifierException("Profile ID '"+ profileId +"' doesn't exists");
+    public Profile findProfileByIdentifier(Long profileId) {
+        if (profileId == null) {
+            throw new ProfileIdentifierException("Profile ID '" + profileId + "' doesn't exists");
         }
         return profileRepository.findById(profileId).get();
     }
 
-    public Profile updateProfile(Profile updatedProfile, Long profileId){
-
+    public Profile updateProfile(Profile updatedProfile, Long profileId) {
         Profile profile = findProfileByIdentifier(profileId);
         profile = updatedProfile;
         return profileRepository.save(profile);
     }
 
-    public Iterable<Profile> findAllProfiles(){
+    public Iterable<Profile> findAllProfiles() {
         return profileRepository.findAll();
     }
 
