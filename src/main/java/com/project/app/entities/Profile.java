@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,6 +33,10 @@ public class Profile {
 
     @OneToOne
     private User user;
+
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY, mappedBy = "profileRating")
+    private List<Rating> ratings = new ArrayList<>();
 
     public Profile() {
     }

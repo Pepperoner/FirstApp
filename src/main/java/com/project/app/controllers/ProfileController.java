@@ -1,6 +1,7 @@
 package com.project.app.controllers;
 
 import com.project.app.entities.Profile;
+import com.project.app.entities.Rating;
 import com.project.app.services.ProfileService;
 import com.project.app.services.ValidationErrorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,17 @@ public class ProfileController {
         this.profileService = profileService;
         this.validationErrorService = validationErrorService;
     }
+
+    //@PostMapping("/{profileId}")
+    //public ResponseEntity<?> addLikeOrDislikeToProfile(@Valid @RequestBody Rating rating,
+    //                                        BindingResult result, @PathVariable Long profileId, Principal principal){
+    //    ResponseEntity<?> errorMap = validationErrorService.mapValidationService(result);
+    //    if (errorMap != null) return errorMap;
+
+    //    Rating addRating = profileService.addLikeOrDislike(profileId, rating, principal.getName());
+
+    //    return new ResponseEntity<>(addRating, HttpStatus.CREATED);
+    //}
 
     @GetMapping("/{profileId}")
     public ResponseEntity<?> getProfileById(@PathVariable Long profileId){
