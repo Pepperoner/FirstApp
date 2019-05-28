@@ -11,10 +11,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/profile")
+@RequestMapping("/api/profiles")
 @CrossOrigin
 public class ProfileController {
 
@@ -51,7 +52,8 @@ public class ProfileController {
         ResponseEntity<?> errorMap = validationErrorService.mapValidationService(result);
         if(errorMap != null) return errorMap;
 
-        Profile updatedProfile = profileService.updateProfile(profileEntity, profileId);
+
+        Profile updatedProfile = profileService.updateProfile(profileEntity, profileId, principal);
 
         return new ResponseEntity<>(updatedProfile,HttpStatus.OK);
     }
@@ -60,4 +62,6 @@ public class ProfileController {
     public Iterable<Profile> getAllProjects(){
         return profileService.findAllProfiles();
     }
+
+
 }

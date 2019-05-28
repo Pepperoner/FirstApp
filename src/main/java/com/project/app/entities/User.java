@@ -38,7 +38,7 @@ public class User implements UserDetails{
 
     private String registrationStatus;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private Profile profile;
 
