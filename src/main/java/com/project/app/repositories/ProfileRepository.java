@@ -1,6 +1,7 @@
 package com.project.app.repositories;
 
 import com.project.app.entities.Profile;
+import com.project.app.entities.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,4 +13,5 @@ public interface ProfileRepository extends CrudRepository<Profile, Long> {
 
     @Override
     Iterable<Profile> findAll();
+
 }

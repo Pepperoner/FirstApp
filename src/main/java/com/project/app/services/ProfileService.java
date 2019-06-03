@@ -1,27 +1,27 @@
 package com.project.app.services;
 
 import com.project.app.entities.Profile;
+import com.project.app.entities.User;
 import com.project.app.exceptions.ProfileIdentifierException;
 import com.project.app.exceptions.ProfileNotFoundException;
 import com.project.app.repositories.ProfileRepository;
-import org.apache.commons.io.FileUtils;
+import com.project.app.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.security.Principal;
 import java.util.Base64;
 
 @Service
 public class ProfileService {
 
     private ProfileRepository profileRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    public ProfileService(ProfileRepository profileRepository) {
+    public ProfileService(ProfileRepository profileRepository, UserRepository userRepository) {
         this.profileRepository = profileRepository;
+        this.userRepository=userRepository;
     }
 
     public Profile findProfileByIdentifier(Long profileId) {
@@ -32,24 +32,20 @@ public class ProfileService {
     }
 
     public Profile updateProfile(Profile updatedProfile, String principalName) {
+        User currentUser = userRepository.findByUsername(principalName);
 
-        if (updatedProfile.getId() != null){
-            Profile existingProfile = findProfileByIdentifier(updatedProfile.getId());
+        fixUpdatedProfileId(updatedProfile, currentUser);
 
-            if (existingProfile != null && (!existingProfile.getUser().getUsername().equals(principalName))){
-                throw new ProfileNotFoundException("This profile not found in your account");
-            } else if(existingProfile == null) {
-                throw new ProfileNotFoundException("Profile with ID '" + updatedProfile.getId() + "' cannot be updated, it doesn't exists");
-            }
-        }
+        fixUpdatedProfileUser(updatedProfile, currentUser);
 
-       // updatedProfile.setProfilePicture(encoder()); for easier testing
+        fixUpdatedProfileRatings(updatedProfile, currentUser);
+
+        // updatedProfile.setProfilePicture(encoder()); for easier testing
        // System.out.println(updatedProfile.getUser().getUsername());
-        if (principalName.equals(updatedProfile.getUser().getUsername())) {
 
+        if (principalName.equals(updatedProfile.getUser().getUsername())) {
             Profile profile = findProfileByIdentifier(updatedProfile.getId());
             profile = updatedProfile;
-
 
             if (profile.getProfilePicture()!=null &&
                     pictureDecoder(updatedProfile.getProfilePicture(), updatedProfile.getId()) != null) {
@@ -60,6 +56,26 @@ public class ProfileService {
         }
         return new Profile();
     }
+
+    private void fixUpdatedProfileRatings(Profile updatedProfile, User currentUser) {
+        if(!profileRepository.findById(currentUser.getId()).get().getRatings().equals(updatedProfile.getRatings())){
+            updatedProfile.setRatings(profileRepository.findById(currentUser.getId()).get().getRatings());
+        }
+    }
+
+    private void fixUpdatedProfileUser(Profile updatedProfile, User currentUser) {
+        if(!currentUser.equals(updatedProfile.getUser())){
+            updatedProfile.setUser(currentUser);
+        }
+    }
+
+    private void fixUpdatedProfileId(Profile updatedProfile, User currentUser) {
+        if(!currentUser.getId().equals(updatedProfile.getId())){
+            updatedProfile.setId(currentUser.getId());
+        }
+    }
+
+
 
   /*  private String encoder() {
         String filePath = "C:\\Users\\user\\IdeaProjects\\FirstApp\\src\\main\\resources\\The_Earth_seen_from_Apollo_17.jpg";
