@@ -24,19 +24,17 @@ public class User implements UserDetails{
     private Long id;
 
     @Email(message = "Username needs to be an email")
-    @NotBlank(message = "Please enter email")
+    @NotBlank(message = "Email is required")
     @Column(unique = true)
     private String username;
 
     @NotBlank(message = "Password is required")
     private String password;
 
-    @NotBlank(message = "Username is required")
+    @NotBlank(message = "FullName is required")
     private String fullName;
 
-    private Boolean isPosted;
-
-    private String registrationStatus;
+    private String jobTitle;
 
     @OneToOne(mappedBy = "user", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore

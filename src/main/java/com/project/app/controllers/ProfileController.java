@@ -31,27 +31,16 @@ public class ProfileController {
         this.validationErrorService = validationErrorService;
     }
 
-    @PostMapping("/{profileId}")
-    public ResponseEntity<?> addLikeOrDislikeToProfile(@Valid @RequestBody Rating rating,
-                                                       BindingResult result, @PathVariable Long profileId, Principal principal){
+    @PostMapping("/{profileId}/like")
+    public ResponseEntity<?> addLikeToProfile(@Valid @RequestBody Rating rating,
+                                            BindingResult result, @PathVariable Long profileId, Principal principal){
         ResponseEntity<?> errorMap = validationErrorService.mapValidationService(result);
         if (errorMap != null) return errorMap;
 
-        Rating addRating = ratingService.addLikeOrDislike(profileId, rating, principal.getName());
+        Rating addRating = ratingService.addLike(profileId, rating, principal.getName());
 
         return new ResponseEntity<>(addRating, HttpStatus.CREATED);
     }
-
-    //@PostMapping("/{profileId}")
-    //public ResponseEntity<?> addLikeOrDislikeToProfile(@Valid @RequestBody Rating rating,
-    //                                        BindingResult result, @PathVariable Long profileId, Principal principal){
-    //    ResponseEntity<?> errorMap = validationErrorService.mapValidationService(result);
-    //    if (errorMap != null) return errorMap;
-
-    //    Rating addRating = profileService.addLikeOrDislike(profileId, rating, principal.getName());
-
-    //    return new ResponseEntity<>(addRating, HttpStatus.CREATED);
-    //}
 
     @GetMapping("/{profileId}")
     public ResponseEntity<?> getProfileById(@PathVariable Long profileId){
@@ -59,15 +48,15 @@ public class ProfileController {
         return new ResponseEntity<>(profile,HttpStatus.OK);
     }
 
-    @PatchMapping("/{profileId}")
+    @PostMapping("")
     public ResponseEntity<?> updateProfileById(@Valid @RequestBody Profile profileEntity, BindingResult result,
-                                               @PathVariable Long profileId, Principal principal){
+                                               Principal principal){
 
         ResponseEntity<?> errorMap = validationErrorService.mapValidationService(result);
         if(errorMap != null) return errorMap;
 
 
-        Profile updatedProfile = profileService.updateProfile(profileEntity, profileId, principal);
+        Profile updatedProfile = profileService.updateProfile(profileEntity, principal.getName());
 
         return new ResponseEntity<>(updatedProfile,HttpStatus.OK);
     }

@@ -2,6 +2,7 @@ package com.project.app.services;
 
 import com.project.app.entities.Profile;
 import com.project.app.exceptions.ProfileIdentifierException;
+import com.project.app.exceptions.ProfileNotFoundException;
 import com.project.app.repositories.ProfileRepository;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,18 +31,30 @@ public class ProfileService {
         return profileRepository.findById(profileId).get();
     }
 
-    public Profile updateProfile(Profile updatedProfile, Long profileId, Principal principal) {
+    public Profile updateProfile(Profile updatedProfile, String principalName) {
+
+        if (updatedProfile.getId() != null){
+            Profile existingProfile = findProfileByIdentifier(updatedProfile.getId());
+
+            if (existingProfile != null && (!existingProfile.getUser().getUsername().equals(principalName))){
+                throw new ProfileNotFoundException("This profile not found in your account");
+            } else if(existingProfile == null) {
+                throw new ProfileNotFoundException("Profile with ID '" + updatedProfile.getId() + "' cannot be updated, it doesn't exists");
+            }
+        }
 
        // updatedProfile.setProfilePicture(encoder()); for easier testing
-        System.out.println(updatedProfile.getUser().getUsername());
-        if (principal.getName().equals(updatedProfile.getUser().getUsername())) {
+       // System.out.println(updatedProfile.getUser().getUsername());
+        if (principalName.equals(updatedProfile.getUser().getUsername())) {
 
-            Profile profile = findProfileByIdentifier(profileId);
+            Profile profile = findProfileByIdentifier(updatedProfile.getId());
             profile = updatedProfile;
+
+
             if (profile.getProfilePicture()!=null &&
-                    pictureDecoder(updatedProfile.getProfilePicture(), profileId) != null) {
+                    pictureDecoder(updatedProfile.getProfilePicture(), updatedProfile.getId()) != null) {
                // FileOutputStream fileOutputStream = pictureDecoder(updatedProfile.getProfilePicture(), profileId);
-                profile.setProfilePicture(profileId + ".jpg");
+                profile.setProfilePicture(updatedProfile.getId() + ".jpg");
             }
             return profileRepository.save(profile);
         }

@@ -1,8 +1,10 @@
 package com.project.app.controllers;
 
 import com.project.app.entities.Profile;
+import com.project.app.entities.Rating;
 import com.project.app.entities.User;
 import com.project.app.services.ProfileService;
+import com.project.app.services.RatingService;
 import com.project.app.services.UserService;
 import com.project.app.services.ValidationErrorService;
 import com.project.app.validators.UserValidator;
@@ -31,17 +33,19 @@ public class UserController {
     private ValidationErrorService validationErrorService;
     private UserService userService;
     private ProfileService profileService;
+    private RatingService ratingService;
     private UserValidator userValidator;
     private JwtTokenProvider tokenProvider;
     private AuthenticationManager authenticationManager;
 
     @Autowired
     public UserController(ValidationErrorService validationErrorService, UserService userService,
-                          ProfileService profileService, UserValidator userValidator,
+                          ProfileService profileService, RatingService ratingService, UserValidator userValidator,
                           JwtTokenProvider tokenProvider, AuthenticationManager authenticationManager) {
         this.validationErrorService = validationErrorService;
         this.userService = userService;
         this.profileService = profileService;
+        this.ratingService = ratingService;
         this.userValidator = userValidator;
         this.tokenProvider = tokenProvider;
         this.authenticationManager = authenticationManager;
@@ -74,6 +78,7 @@ public class UserController {
 
         User newUser = userService.saveUser(user);
         Profile newProfile = profileService.saveProfile(new Profile(newUser));
+        Rating rating = ratingService.saveRating(new Rating(newProfile));
         return  new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 }

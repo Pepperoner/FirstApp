@@ -18,9 +18,21 @@ public class Rating {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
+    private String likeSourceUsername;
+
+    private String likeDestinationUsername;
+
+    private String someRating;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id")
+    @JsonIgnore
     private Profile profileRating;
+
+    public Rating(Profile profileRating) {
+        this.profileRating = profileRating;
+    }
+
+    public Rating() {
+    }
 }

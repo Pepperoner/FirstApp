@@ -16,7 +16,6 @@ import java.util.List;
 public class Profile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String profilePicture;
@@ -43,5 +42,6 @@ public class Profile {
 
     public Profile(User user) {
         this.user = user;
+        this.id = user.getId();
     }
 }
