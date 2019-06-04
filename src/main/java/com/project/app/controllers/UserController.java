@@ -78,7 +78,7 @@ public class UserController {
 
         User newUser = userService.saveUser(user);
         Profile newProfile = profileService.saveProfile(new Profile(newUser));
-        Rating rating = ratingService.saveRating(new Rating(newProfile));
+       // Rating rating = ratingService.saveRating(new Rating(newProfile));
         return  new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.websocket.server.PathParam;
 import java.security.Principal;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/profiles")
@@ -33,7 +34,7 @@ public class ProfileController {
 
     @PostMapping("/{profileId}/like")
     public ResponseEntity<?> addLikeToProfile(@Valid @RequestBody Rating rating,
-                                            BindingResult result, @PathVariable Long profileId, Principal principal){
+                                              BindingResult result, @PathVariable Long profileId, Principal principal) {
         ResponseEntity<?> errorMap = validationErrorService.mapValidationService(result);
         if (errorMap != null) return errorMap;
 
@@ -43,27 +44,27 @@ public class ProfileController {
     }
 
     @GetMapping("/{profileId}")
-    public ResponseEntity<?> getProfileById(@PathVariable Long profileId){
+    public ResponseEntity<?> getProfileById(@PathVariable Long profileId) {
         Profile profile = profileService.findProfileByIdentifier(profileId);
-        return new ResponseEntity<>(profile,HttpStatus.OK);
+        return new ResponseEntity<>(profile, HttpStatus.OK);
     }
 
     @PostMapping("")
     public ResponseEntity<?> updateProfileById(@Valid @RequestBody Profile profileEntity, BindingResult result,
-                                               Principal principal){
+                                               Principal principal) {
 
         ResponseEntity<?> errorMap = validationErrorService.mapValidationService(result);
-        if(errorMap != null) return errorMap;
+        if (errorMap != null) return errorMap;
 
 
         Profile updatedProfile = profileService.updateProfile(profileEntity, principal.getName());
 
-        return new ResponseEntity<>(updatedProfile,HttpStatus.OK);
+        return new ResponseEntity<>(updatedProfile, HttpStatus.OK);
     }
 
     @GetMapping("/all")
-    public Iterable<Profile> getAllProjects(){
-        return profileService.findAllProfiles();
+    public Map<Long,Boolean> getAllProfiles( Principal principal) {
+        return profileService.getAllProfilesWithLikeOpportunity(principal.getName());
     }
 
 

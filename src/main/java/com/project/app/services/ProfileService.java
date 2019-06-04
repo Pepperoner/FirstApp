@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class ProfileService {
@@ -21,7 +23,7 @@ public class ProfileService {
     @Autowired
     public ProfileService(ProfileRepository profileRepository, UserRepository userRepository) {
         this.profileRepository = profileRepository;
-        this.userRepository=userRepository;
+        this.userRepository = userRepository;
     }
 
     public Profile findProfileByIdentifier(Long profileId) {
@@ -41,15 +43,15 @@ public class ProfileService {
         fixUpdatedProfileRatings(updatedProfile, currentUser);
 
         // updatedProfile.setProfilePicture(encoder()); for easier testing
-       // System.out.println(updatedProfile.getUser().getUsername());
+        // System.out.println(updatedProfile.getUser().getUsername());
 
         if (principalName.equals(updatedProfile.getUser().getUsername())) {
             Profile profile = findProfileByIdentifier(updatedProfile.getId());
             profile = updatedProfile;
 
-            if (profile.getProfilePicture()!=null &&
+            if (profile.getProfilePicture() != null &&
                     pictureDecoder(updatedProfile.getProfilePicture(), updatedProfile.getId()) != null) {
-               // FileOutputStream fileOutputStream = pictureDecoder(updatedProfile.getProfilePicture(), profileId);
+                // FileOutputStream fileOutputStream = pictureDecoder(updatedProfile.getProfilePicture(), profileId);
                 profile.setProfilePicture(updatedProfile.getId() + ".jpg");
             }
             return profileRepository.save(profile);
@@ -58,25 +60,22 @@ public class ProfileService {
     }
 
     private void fixUpdatedProfileRatings(Profile updatedProfile, User currentUser) {
-        if(!profileRepository.findById(currentUser.getId()).get().getRatings().equals(updatedProfile.getRatings())){
+        if (!profileRepository.findById(currentUser.getId()).get().getRatings().equals(updatedProfile.getRatings())) {
             updatedProfile.setRatings(profileRepository.findById(currentUser.getId()).get().getRatings());
         }
     }
 
     private void fixUpdatedProfileUser(Profile updatedProfile, User currentUser) {
-        if(!currentUser.equals(updatedProfile.getUser())){
+        if (!currentUser.equals(updatedProfile.getUser())) {
             updatedProfile.setUser(currentUser);
         }
     }
 
     private void fixUpdatedProfileId(Profile updatedProfile, User currentUser) {
-        if(!currentUser.getId().equals(updatedProfile.getId())){
+        if (!currentUser.getId().equals(updatedProfile.getId())) {
             updatedProfile.setId(currentUser.getId());
         }
     }
-
-
-
   /*  private String encoder() {
         String filePath = "C:\\Users\\user\\IdeaProjects\\FirstApp\\src\\main\\resources\\The_Earth_seen_from_Apollo_17.jpg";
         byte[] fileContent = new byte[0];
@@ -95,12 +94,38 @@ public class ProfileService {
         return profileRepository.findAll();
     }
 
+    public Map<Long, Boolean> getAllProfilesWithLikeOpportunity(String principalName) {
+        User currentUser = userRepository.findByUsername(principalName);
+
+        Profile currentProfile=profileRepository.findById(currentUser.getId()).get();
+
+        Map<Long, Boolean> profileBooleanMap = new HashMap<>();
+       // System.out.println(profileRepository.findAll());
+       /* profileRepository.findAll().iterator()
+                .forEachRemaining(profile -> profileBooleanMap.put(profile.getId(),true));*/
+       // System.out.println(currentProfile);
+        System.out.println(currentProfile.getRatings().isEmpty());
+
+        profileRepository.findAll().iterator()
+                .forEachRemaining(profile -> {
+                    if (!currentProfile.getRatings().isEmpty() && !profile.equals(currentProfile)) {
+                        profileBooleanMap.put(profile.getId(),
+                                currentProfile.getRatings().stream()
+                                        .noneMatch(rating -> profile.getUser().getUsername().equals(rating
+                                                .getLikeSourceUsername())));
+                    }else if(currentProfile.getRatings().isEmpty() && !profile.equals(currentProfile)){
+                        profileBooleanMap.put(profile.getId(), true);
+                    }
+                });
+        return profileBooleanMap;
+    }
+
     public <S extends Profile> S saveProfile(S entity) {
         return profileRepository.save(entity);
     }
 
     private FileOutputStream pictureDecoder(String base64Picture, Long id) {
-        try (FileOutputStream fos = new FileOutputStream( id + ".jpg")) {
+        try (FileOutputStream fos = new FileOutputStream(id + ".jpg")) {
             fos.write(Base64.getDecoder().decode(base64Picture));
             return fos;
         } catch (Exception e) {

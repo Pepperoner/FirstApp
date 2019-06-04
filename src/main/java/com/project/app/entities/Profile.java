@@ -1,18 +1,23 @@
 package com.project.app.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude="user")
 @Entity
 @Table(name = "profiles")
+@ToString
 public class Profile {
 
     @Id
@@ -31,6 +36,7 @@ public class Profile {
     private String skills;
 
     @OneToOne
+    @JsonIgnore
     private User user;
 
     @OneToMany(cascade = CascadeType.ALL,
@@ -42,6 +48,9 @@ public class Profile {
 
     public Profile(User user) {
         this.id=user.getId();
+        this.likes=0L;
+        this.dislikes=0L;
         this.user = user;
+        this.user.setJobTitle(JobTitle.getById(new Random().nextInt(10 + 1) + 1));
     }
 }
