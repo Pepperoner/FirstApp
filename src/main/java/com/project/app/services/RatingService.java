@@ -27,19 +27,19 @@ public class RatingService {
         Profile profile = profileService.findProfileByIdentifier(profileIdentifier);
         updatedRating.setProfileRating(profile);
 
-            if (!updatedRating.getLikeSourceUsername().equals(profile.getUser().getUsername())) {
+            if (!userName.equals(profile.getUser().getUsername())) {
                 Long profileLike = 0L;
                 if (profile.getLikes() == null){
                     profileLike++;
                     profile.setLikes(profileLike);
-                    updatedRating.setLikeSourceUsername(updatedRating.getLikeSourceUsername());
-                    System.out.println("IF //////////////////////////");
+                    updatedRating.setLikeSourceUsername(userName);
+
                 } else {
                     profileLike = profile.getLikes();
                     profileLike++;
                     profile.setLikes(profileLike);
-                    updatedRating.setLikeSourceUsername(updatedRating.getLikeSourceUsername());
-                    System.out.println("ELSE /////////////////////////");
+                    updatedRating.setLikeSourceUsername(userName);
+
                 }
             }
 

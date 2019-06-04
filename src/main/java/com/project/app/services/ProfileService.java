@@ -46,15 +46,22 @@ public class ProfileService {
         // System.out.println(updatedProfile.getUser().getUsername());
 
         if (principalName.equals(updatedProfile.getUser().getUsername())) {
-            Profile profile = findProfileByIdentifier(updatedProfile.getId());
-            profile = updatedProfile;
 
-            if (profile.getProfilePicture() != null &&
+            Profile profileFromDB = findProfileByIdentifier(updatedProfile.getId());
+
+            if (updatedProfile.getInformation() != null){
+                profileFromDB.setInformation(updatedProfile.getInformation());
+            }
+            if (updatedProfile.getSkills() != null){
+                profileFromDB.setSkills(updatedProfile.getSkills());
+            }
+
+            if (profileFromDB.getProfilePicture() != null &&
                     pictureDecoder(updatedProfile.getProfilePicture(), updatedProfile.getId()) != null) {
                 // FileOutputStream fileOutputStream = pictureDecoder(updatedProfile.getProfilePicture(), profileId);
-                profile.setProfilePicture(updatedProfile.getId() + ".jpg");
+                profileFromDB.setProfilePicture(updatedProfile.getId() + ".jpg");
             }
-            return profileRepository.save(profile);
+            return profileRepository.save(profileFromDB);
         }
         return new Profile();
     }
@@ -100,11 +107,6 @@ public class ProfileService {
         Profile currentProfile=profileRepository.findById(currentUser.getId()).get();
 
         Map<Long, Boolean> profileBooleanMap = new HashMap<>();
-       // System.out.println(profileRepository.findAll());
-       /* profileRepository.findAll().iterator()
-                .forEachRemaining(profile -> profileBooleanMap.put(profile.getId(),true));*/
-       // System.out.println(currentProfile);
-        System.out.println(currentProfile.getRatings().isEmpty());
 
         profileRepository.findAll().iterator()
                 .forEachRemaining(profile -> {
