@@ -3,7 +3,6 @@ package com.project.app.services;
 import com.project.app.entities.Profile;
 import com.project.app.entities.User;
 import com.project.app.exceptions.ProfileIdentifierException;
-import com.project.app.exceptions.ProfileNotFoundException;
 import com.project.app.repositories.ProfileRepository;
 import com.project.app.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,7 +113,7 @@ public class ProfileService {
                         profileBooleanMap.put(profile.getId(),
                                 currentProfile.getRatings().stream()
                                         .noneMatch(rating -> profile.getUser().getUsername().equals(rating
-                                                .getLikeSourceUsername())));
+                                                .getRatingSourceUsername())));
                     }else if(currentProfile.getRatings().isEmpty() && !profile.equals(currentProfile)){
                         profileBooleanMap.put(profile.getId(), true);
                     }

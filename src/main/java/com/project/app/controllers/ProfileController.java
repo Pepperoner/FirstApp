@@ -12,7 +12,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
 import java.security.Principal;
 import java.util.Map;
 
@@ -43,6 +42,17 @@ public class ProfileController {
         return new ResponseEntity<>(addRating, HttpStatus.CREATED);
     }
 
+    @PostMapping("/{profileId}/dislike")
+    public ResponseEntity<?> addDislikeToProfile(@Valid @RequestBody Rating rating,
+                                              BindingResult result, @PathVariable Long profileId, Principal principal) {
+        ResponseEntity<?> errorMap = validationErrorService.mapValidationService(result);
+        if (errorMap != null) return errorMap;
+
+        Rating addRating = ratingService.addDislike(profileId, rating, principal.getName());
+
+        return new ResponseEntity<>(addRating, HttpStatus.CREATED);
+    }
+
     @GetMapping("/{profileId}")
     public ResponseEntity<?> getProfileById(@PathVariable Long profileId) {
         Profile profile = profileService.findProfileByIdentifier(profileId);
@@ -66,6 +76,4 @@ public class ProfileController {
     public Map<Long,Boolean> getAllProfiles( Principal principal) {
         return profileService.getAllProfilesWithLikeOpportunity(principal.getName());
     }
-
-
 }

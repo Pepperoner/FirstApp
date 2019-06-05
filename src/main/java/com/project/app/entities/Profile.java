@@ -1,14 +1,11 @@
 package com.project.app.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -36,7 +33,6 @@ public class Profile {
     private String skills;
 
     @OneToOne
-    @JsonIgnore
     private User user;
 
     @OneToMany(cascade = CascadeType.ALL,
