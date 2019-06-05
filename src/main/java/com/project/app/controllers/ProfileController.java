@@ -1,5 +1,6 @@
 package com.project.app.controllers;
 
+import com.project.app.entities.LikebleProfile;
 import com.project.app.entities.Profile;
 import com.project.app.entities.Rating;
 import com.project.app.services.ProfileService;
@@ -66,14 +67,13 @@ public class ProfileController {
         ResponseEntity<?> errorMap = validationErrorService.mapValidationService(result);
         if (errorMap != null) return errorMap;
 
-
         Profile updatedProfile = profileService.updateProfile(profileEntity, principal.getName());
 
         return new ResponseEntity<>(updatedProfile, HttpStatus.OK);
     }
 
     @GetMapping("/all")
-    public Map<Long,Boolean> getAllProfiles( Principal principal) {
+    public Iterable<LikebleProfile> getAllProfiles(Principal principal) {
         return profileService.getAllProfilesWithLikeOpportunity(principal.getName());
     }
 }

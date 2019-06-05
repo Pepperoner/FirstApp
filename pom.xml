@@ -6,7 +6,7 @@
 
     <groupId>first-app</groupId>
     <artifactId>first-app-artifact</artifactId>
-    <version>grampus-1.0</version>
+    <version>grampus-profile-update</version>
     <packaging>war</packaging>
 
     <parent>

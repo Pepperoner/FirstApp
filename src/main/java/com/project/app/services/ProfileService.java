@@ -1,5 +1,6 @@
 package com.project.app.services;
 
+import com.project.app.entities.LikebleProfile;
 import com.project.app.entities.Profile;
 import com.project.app.entities.User;
 import com.project.app.exceptions.ProfileIdentifierException;
@@ -9,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ProfileService {
@@ -48,10 +47,10 @@ public class ProfileService {
 
             Profile profileFromDB = findProfileByIdentifier(updatedProfile.getId());
 
-            if (updatedProfile.getInformation() != null){
+            if (updatedProfile.getInformation() != null) {
                 profileFromDB.setInformation(updatedProfile.getInformation());
             }
-            if (updatedProfile.getSkills() != null){
+            if (updatedProfile.getSkills() != null) {
                 profileFromDB.setSkills(updatedProfile.getSkills());
             }
 
@@ -100,25 +99,51 @@ public class ProfileService {
         return profileRepository.findAll();
     }
 
-    public Map<Long, Boolean> getAllProfilesWithLikeOpportunity(String principalName) {
+    public Iterable<LikebleProfile> getAllProfilesWithLikeOpportunity(String principalName) {
         User currentUser = userRepository.findByUsername(principalName);
 
-        Profile currentProfile=profileRepository.findById(currentUser.getId()).get();
+        Profile currentProfile = profileRepository.findById(currentUser.getId()).get();
 
-        Map<Long, Boolean> profileBooleanMap = new HashMap<>();
+        List<LikebleProfile> likebleProfiles = new ArrayList<>();
 
         profileRepository.findAll().iterator()
                 .forEachRemaining(profile -> {
-                    if (!currentProfile.getRatings().isEmpty() && !profile.equals(currentProfile)) {
-                        profileBooleanMap.put(profile.getId(),
-                                currentProfile.getRatings().stream()
-                                        .noneMatch(rating -> profile.getUser().getUsername().equals(rating
-                                                .getRatingSourceUsername())));
-                    }else if(currentProfile.getRatings().isEmpty() && !profile.equals(currentProfile)){
-                        profileBooleanMap.put(profile.getId(), true);
+                    if (isProfileRaringEmptyAndNotEqualsCurrent(currentProfile, profile, profile.getRatings().isEmpty())) {
+                        getProfileWithLikeAvailability(likebleProfiles, profile, true);
+                        return;
+                    } else if (isProfileRatingIncludeLikeFromCurrent(currentProfile, profile)) {
+                        getProfileWithLikeAvailability(likebleProfiles, profile, false);
+                        return;
+                    } else if (isProfileRaringNotEmptyAndNotEqualsCurrent(currentProfile, profile, profile.getRatings().isEmpty())) {
+                        getProfileWithLikeAvailability(likebleProfiles, profile, true);
                     }
                 });
-        return profileBooleanMap;
+        return likebleProfiles;
+    }
+
+    private void getProfileWithLikeAvailability(List<LikebleProfile> likebleProfiles, Profile profile, boolean b) {
+        likebleProfiles.add(LikebleProfile.builder()
+                .profileId(profile.getId())
+                .picture(profile.getProfilePicture())
+                .fullName(profile.getUser().getFullName())
+                .jobTitle(profile.getUser().getJobTitle())
+                .isAbleToLike(b)
+                .build());
+    }
+
+    private boolean isProfileRatingIncludeLikeFromCurrent(Profile currentProfile, Profile profile) {
+        return !profile.getRatings().isEmpty() && !profile.equals(currentProfile) &&
+                profile.getRatings().stream()
+                        .anyMatch(rating -> currentProfile.getUser().getUsername().equals(rating
+                                .getRatingSourceUsername()));
+    }
+
+    private boolean isProfileRaringEmptyAndNotEqualsCurrent(Profile currentProfile, Profile profile, boolean empty) {
+        return empty && !profile.equals(currentProfile);
+    }
+
+    private boolean isProfileRaringNotEmptyAndNotEqualsCurrent(Profile currentProfile, Profile profile, boolean empty) {
+        return !empty && !profile.equals(currentProfile);
     }
 
     public <S extends Profile> S saveProfile(S entity) {
