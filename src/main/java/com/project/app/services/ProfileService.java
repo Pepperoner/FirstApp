@@ -78,7 +78,7 @@ public class ProfileService {
         }
     }
 
-    public Iterable<LikableProfile> getAllProfilesWithLikeOpportunity(String principalName) {
+    public List<LikableProfile> getAllProfilesWithLikeOpportunity(String principalName) {
         User currentUser = userRepository.findByUsername(principalName);
 
         Profile currentProfile = profileRepository.findById(currentUser.getId()).get();

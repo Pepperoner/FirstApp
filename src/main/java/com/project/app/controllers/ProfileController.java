@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/profiles")
@@ -44,7 +47,7 @@ public class ProfileController {
 
     @PostMapping("/{profileId}/dislike")
     public ResponseEntity<?> addDislikeToProfile(@Valid @RequestBody Rating rating,
-                                              BindingResult result, @PathVariable Long profileId, Principal principal) {
+                                                 BindingResult result, @PathVariable Long profileId, Principal principal) {
         ResponseEntity<?> errorMap = validationErrorService.mapValidationService(result);
         if (errorMap != null) return errorMap;
 
@@ -72,7 +75,11 @@ public class ProfileController {
     }
 
     @GetMapping("/all")
-    public Iterable<LikableProfile> getAllProfiles(Principal principal) {
-        return profileService.getAllProfilesWithLikeOpportunity(principal.getName());
+    public Iterable<LikableProfile> getAllProfiles(@RequestParam(value = "fullname", defaultValue = "") String fullName, Principal principal) {
+
+        return fullName.length() > 0 ? profileService.getAllProfilesWithLikeOpportunity(principal.getName()).stream()
+                .filter(likableProfile ->
+                        Pattern.compile(fullName.toLowerCase()).matcher(likableProfile.getFullName().toLowerCase()).find()).collect(Collectors.toList()) :
+                profileService.getAllProfilesWithLikeOpportunity(principal.getName());
     }
 }

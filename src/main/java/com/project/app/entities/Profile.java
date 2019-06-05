@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Random;
 
 @Getter
 @Setter
-@EqualsAndHashCode(exclude="user")
+@EqualsAndHashCode(exclude = "user")
 @Entity
 @Table(name = "profiles")
 @ToString
@@ -43,10 +44,10 @@ public class Profile {
     }
 
     public Profile(User user) {
-        this.id=user.getId();
-        this.likes=0L;
-        this.dislikes=0L;
+        this.id = user.getId();
+        this.likes = 0L;
+        this.dislikes = 0L;
         this.user = user;
-        this.user.setJobTitle(JobTitle.getById(new Random().nextInt(10 + 1) + 1));
+        this.user.setJobTitle(JobTitle.getById((int) (Math.random() * (10 - 1))+1));
     }
 }
