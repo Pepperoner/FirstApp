@@ -9,7 +9,7 @@ public enum JobTitle {
     QA(6, "QA"),
     PM(7, "PM"),
     ADMIN(8, "sys admin"),
-    ARCHITECTOR(9, "architector"),
+    ARCHITECT(9, "architect"),
     OFFICE_MANAGER(10, "office manager");
 
     private final Integer id;

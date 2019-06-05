@@ -1,6 +1,6 @@
 package com.project.app.services;
 
-import com.project.app.entities.LikebleProfile;
+import com.project.app.entities.LikableProfile;
 import com.project.app.entities.Profile;
 import com.project.app.entities.User;
 import com.project.app.exceptions.ProfileIdentifierException;
@@ -40,9 +40,6 @@ public class ProfileService {
 
         fixUpdatedProfileRatings(updatedProfile, currentUser);
 
-        // updatedProfile.setProfilePicture(encoder()); for easier testing
-        // System.out.println(updatedProfile.getUser().getUsername());
-
         if (principalName.equals(updatedProfile.getUser().getUsername())) {
 
             Profile profileFromDB = findProfileByIdentifier(updatedProfile.getId());
@@ -56,7 +53,6 @@ public class ProfileService {
 
             if (profileFromDB.getProfilePicture() != null &&
                     pictureDecoder(updatedProfile.getProfilePicture(), updatedProfile.getId()) != null) {
-                // FileOutputStream fileOutputStream = pictureDecoder(updatedProfile.getProfilePicture(), profileId);
                 profileFromDB.setProfilePicture(updatedProfile.getId() + ".jpg");
             }
             return profileRepository.save(profileFromDB);
@@ -81,48 +77,31 @@ public class ProfileService {
             updatedProfile.setId(currentUser.getId());
         }
     }
-  /*  private String encoder() {
-        String filePath = "C:\\Users\\user\\IdeaProjects\\FirstApp\\src\\main\\resources\\The_Earth_seen_from_Apollo_17.jpg";
-        byte[] fileContent = new byte[0];
-        String encodedString = null;
-        try {
-            fileContent = FileUtils.readFileToByteArray(new File(filePath));
-            encodedString = Base64.getEncoder().encodeToString(fileContent);
-            System.out.println(encodedString);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return encodedString;
-    }*/
 
-    public Iterable<Profile> findAllProfiles() {
-        return profileRepository.findAll();
-    }
-
-    public Iterable<LikebleProfile> getAllProfilesWithLikeOpportunity(String principalName) {
+    public Iterable<LikableProfile> getAllProfilesWithLikeOpportunity(String principalName) {
         User currentUser = userRepository.findByUsername(principalName);
 
         Profile currentProfile = profileRepository.findById(currentUser.getId()).get();
 
-        List<LikebleProfile> likebleProfiles = new ArrayList<>();
+        List<LikableProfile> likableProfiles = new ArrayList<>();
 
         profileRepository.findAll().iterator()
                 .forEachRemaining(profile -> {
                     if (isProfileRaringEmptyAndNotEqualsCurrent(currentProfile, profile, profile.getRatings().isEmpty())) {
-                        getProfileWithLikeAvailability(likebleProfiles, profile, true);
+                        getProfileWithLikeAvailability(likableProfiles, profile, true);
                         return;
                     } else if (isProfileRatingIncludeLikeFromCurrent(currentProfile, profile)) {
-                        getProfileWithLikeAvailability(likebleProfiles, profile, false);
+                        getProfileWithLikeAvailability(likableProfiles, profile, false);
                         return;
                     } else if (isProfileRaringNotEmptyAndNotEqualsCurrent(currentProfile, profile, profile.getRatings().isEmpty())) {
-                        getProfileWithLikeAvailability(likebleProfiles, profile, true);
+                        getProfileWithLikeAvailability(likableProfiles, profile, true);
                     }
                 });
-        return likebleProfiles;
+        return likableProfiles;
     }
 
-    private void getProfileWithLikeAvailability(List<LikebleProfile> likebleProfiles, Profile profile, boolean b) {
-        likebleProfiles.add(LikebleProfile.builder()
+    private void getProfileWithLikeAvailability(List<LikableProfile> likableProfiles, Profile profile, boolean b) {
+        likableProfiles.add(LikableProfile.builder()
                 .profileId(profile.getId())
                 .picture(profile.getProfilePicture())
                 .fullName(profile.getUser().getFullName())

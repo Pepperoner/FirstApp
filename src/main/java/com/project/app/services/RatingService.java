@@ -27,50 +27,58 @@ public class RatingService {
         updatedRating.setProfileRating(profile);
 
             if (!userName.equals(profile.getUser().getUsername())) {
-                Long profileLike = 0L;
 
-                profileLike++;
-                profile.setLikes(profileLike);
-                updatedRating.setRatingSourceUsername(userName);
-                if(updatedRating.getRatingType().equals("like_best_looker")){
-                    updatedRating.setRatingType(BEST_LOOKER.toString().toLowerCase());
-                }
-                if (updatedRating.getRatingType().equals("like_super_worker")){
-                    updatedRating.setRatingType(SUPER_WORKER.toString().toLowerCase());
-                }
-                if (updatedRating.getRatingType().equals("like_extrovert")){
-                    updatedRating.setRatingType(EXTROVERT.toString().toLowerCase());
-                }
+                addLikeAndCheckForLikeType(updatedRating, userName, profile);
             }
 
         return ratingRepository.save(updatedRating);
+    }
+
+    private void addLikeAndCheckForLikeType(Rating updatedRating, String userName, Profile profile) {
+        Long profileLike = 0L;
+
+        profileLike++;
+        profile.setLikes(profileLike);
+        updatedRating.setRatingSourceUsername(userName);
+
+        if(updatedRating.getRatingType().equals("like_best_looker")){
+            updatedRating.setRatingType(BEST_LOOKER.toString().toLowerCase());
+        }
+        if (updatedRating.getRatingType().equals("like_super_worker")){
+            updatedRating.setRatingType(SUPER_WORKER.toString().toLowerCase());
+        }
+        if (updatedRating.getRatingType().equals("like_extrovert")){
+            updatedRating.setRatingType(EXTROVERT.toString().toLowerCase());
+        }
     }
 
     public Rating addDislike(Long profileIdentifier, Rating updatedRating, String userName){
 
         Profile profile = profileService.findProfileByIdentifier(profileIdentifier);
+        updatedRating.setProfileRating(profile);
 
         if (!userName.equals(profile.getUser().getUsername())) {
-            Long profileDislike = 0L;
-
-            profileDislike++;
-            profile.setDislikes(profileDislike);
-            updatedRating.setRatingSourceUsername(userName);
-            if(updatedRating.getRatingType().equals("dislike_untidy")){
-                updatedRating.setRatingType(UNTIDY.toString().toLowerCase());
-            }
-            if (updatedRating.getRatingType().equals("dislike_deadliner")){
-                updatedRating.setRatingType(DEADLINER.toString().toLowerCase());
-            }
-            if (updatedRating.getRatingType().equals("like_introvert")){
-                updatedRating.setRatingType(INTROVERT.toString().toLowerCase());
-            }
+            addDislikeAndCheckForDislikeType(updatedRating, userName, profile);
         }
 
         return ratingRepository.save(updatedRating);
     }
 
-    public <S extends Rating> S saveRating(S entity) {
-        return ratingRepository.save(entity);
+    private void addDislikeAndCheckForDislikeType(Rating updatedRating, String userName, Profile profile) {
+        Long profileDislike = 0L;
+
+        profileDislike++;
+        profile.setDislikes(profileDislike);
+        updatedRating.setRatingSourceUsername(userName);
+
+        if(updatedRating.getRatingType().equals("dislike_untidy")){
+            updatedRating.setRatingType(UNTIDY.toString().toLowerCase());
+        }
+        if (updatedRating.getRatingType().equals("dislike_deadliner")){
+            updatedRating.setRatingType(DEADLINER.toString().toLowerCase());
+        }
+        if (updatedRating.getRatingType().equals("like_introvert")){
+            updatedRating.setRatingType(INTROVERT.toString().toLowerCase());
+        }
     }
 }

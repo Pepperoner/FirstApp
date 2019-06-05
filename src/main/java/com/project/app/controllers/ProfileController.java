@@ -1,6 +1,6 @@
 package com.project.app.controllers;
 
-import com.project.app.entities.LikebleProfile;
+import com.project.app.entities.LikableProfile;
 import com.project.app.entities.Profile;
 import com.project.app.entities.Rating;
 import com.project.app.services.ProfileService;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/profiles")
@@ -73,7 +72,7 @@ public class ProfileController {
     }
 
     @GetMapping("/all")
-    public Iterable<LikebleProfile> getAllProfiles(Principal principal) {
+    public Iterable<LikableProfile> getAllProfiles(Principal principal) {
         return profileService.getAllProfilesWithLikeOpportunity(principal.getName());
     }
 }

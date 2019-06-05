@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode
 @Builder
-public class LikebleProfile {
+public class LikableProfile {
 
     private Long profileId;
     private String picture;
